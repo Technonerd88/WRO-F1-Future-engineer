@@ -67,9 +67,79 @@ servo (typically 0° to 180°) to our software's steering variables, we achieved
 <img width="363" height="600" alt="Servo steering" src="https://github.com/user-attachments/assets/a3352adb-ee73-48d4-903c-28b13340c422" />
 
 
+DC Motors:
 
+Drive System: DC Propulsion and Dynamic Actuation
+Hardware Overview: High-Torque DC Power
+Team F1 utilizes a high-output DC Motor coupled with an integrated drive assembly to provide the necessary propulsion for the competition.
 
+The DC Motor: Serves as the primary power plant, converting electrical energy from our battery into mechanical rotation.
 
+The Actuator/Drivetrain: Transmits power from the motor shaft to the drive wheels, providing the torque required to reach top speed quickly while maintaining stability during low-speed maneuvers.
+
+ Bidirectional Control (H-Bridge Logic)
+To navigate the complex WRO environment, our robot must be capable of both forward and reverse motion. We implemented an H-Bridge Motor Driver circuit which allows us to:
+
+Forward Propulsion: Rotate the motor clockwise for maximum speed during straightaways.
+
+Reverse Actuation: Quickly reverse the polarity to back away from obstacles or perform three-point turns if the vehicle becomes trapped.
+
+Active Braking: By shorting the motor leads through the driver, we can perform an "Electronic Brake," stopping the robot instantly when the Laser Sensor detects a collision risk.
+
+ Software Implementation: PWM Speed Regulation
+We do not simply turn the motor "On" or "Off." We use Pulse Width Modulation (PWM) to control the velocity. This allows for:
+
+Smooth Acceleration: Gradually increasing the PWM duty cycle to prevent the wheels from spinning out (losing traction) at the start of the race.
+
+Controlled Deceleration: Reducing power as we approach a Red/Green obstacle, ensuring the sensors have enough time to process color data.
+
+Battery Efficiency: By optimizing the power output, we ensure the robot maintains consistent performance throughout the entire 12-marker run.
+
+ Technical Synergy: The "F1" Integration
+The DC Motor works in perfect synchronization with our other components:
+
+Laser Sensor calculates the distance to the wall.
+
+Processor calculates the required speed (PWM).
+
+DC Motor executes the speed, while the Servo handles the direction.
+
+ Engineering Conclusion
+"By utilizing a PWM-controlled DC motor with bidirectional actuation, Team F1 achieved a balance between raw speed and precise positioning. The ability to modulate power allows our vehicle to adapt its velocity based on real-time sensor feedback, ensuring we navigate the 12 milestones with both speed and safety."
+
+The brain:Control System: The Neural Hub (Matrix & Arduino)
+ Hardware Architecture: Matrix Robotics + Arduino Duo
+Team F1’s vehicle is powered by the Arduino-based Matrix Controller. This system acts as the central processor, managing the high-speed communication between our input sensors and output actuators.
+
+The Brain (Arduino): Handles the complex mathematical calculations for the PID steering and the 12-marker color logic.
+
+The Powerhouse (Matrix): Provides the robust electrical interface needed to drive the high-torque DC motors and the precision steering servo, ensuring they receive steady voltage even during high-drain maneuvers.
+
+ Software Logic: Multithreaded Processing Emulation
+Our code is structured to handle multiple data streams simultaneously. The "Brain" processes a continuous loop of three critical tasks:
+
+Sensing: Constantly polling the I2C and Analog ports for data from the 2X Color Sensors and the Laser ToF Sensor.
+
+Decision Making: Comparing real-time data against our "12-Marker Milestone" counter and obstacle detection logic.
+
+Commanding: Sending updated PWM signals to the DC Motor (for speed) and the Servo (for heading).
+
+ Reliability and Communication
+In a competitive robotics environment, electrical noise can be a major issue. We chose the Matrix system because of its:
+
+Integrated Motor Drivers: Reduces wiring complexity, which minimizes the chance of a loose connection during the run.
+
+Regulated Power Rails: Ensures that when the DC motor draws a lot of power to accelerate, the sensors do not "brown out" or lose their calibration.
+
+ Technical Synergy: The "F1" Operating System
+The "Brain" is programmed with a specialized logic flow for the Future Engineers category:
+
+Input Filter: Our Arduino code filters out "noise" from the color sensors to ensure we only count legitimate markers.
+
+Feedback Loop: It creates a closed-loop system where the Laser Sensor tells the brain how far the wall is, and the brain immediately tells the Servo how much to turn.
+
+ Engineering Conclusion
+"The integration of the Matrix Robotics System with an Arduino core provides Team F1 with a flexible yet powerful control platform. By centralizing our sensor fusion and motor control into one synchronized hub, we have created a robot capable of millisecond-level reactions, ensuring a fast, autonomous, and reliable performance in the WRO competition." 
 Repository Structure
 /src: The core C++ source code and control logic.
 
@@ -77,7 +147,30 @@ Repository Structure
 
 /models: 3D design files (.STL) for custom chassis components.
 
-/docs: Engineering journals and performance calibration logs.
+The challenge: 
+Mission Execution & Algorithmic Strategy1. Open Challenge: Adaptive PathfindingObjective: Navigate 3 laps in a randomized corridor without traffic signs.Dynamic Corridor Adaptation: Since the inner wall configuration is unknown until the start, Team F1 uses a Reactive Wall-Following Algorithm. The Laser Sensor acts as a rangefinder, maintaining a "Safety Envelope" from the outer boundary.Mathematical Steering Control: We implemented a proportional control loop where the steering angle $\theta$ is adjusted based on the distance $d$ from the wall:$$\theta = K_p \times (d_{target} - d_{actual})$$Lap Mastery: Color Sensor 1 is programmed to ignore all noise and strictly identify the Start/Finish line color. Once the internal counter hits 3, the robot transitions from "Speed Mode" to "Precision Braking" to secure the finish zone bonus.2. Obstacle Challenge: Cognitive NavigationObjective: Navigate 3 laps while obeying Red/Green traffic pillars and performing a parallel park.Obstacle Perception Layer: The robot utilizes the Laser Sensor to identify a "Point of Interest" (a pillar) up to 30cm ahead. This triggers a state-change in the software.Color Classification & Maneuvering:Red Signal: Upon detection via Color Sensor 2, the Arduino executes a "Keep Right" maneuver, calculating a steering arc that ensures the vehicle stays outside the 85mm penalty zone.Green Signal: The vehicle executes a "Keep Left" maneuver.Trajectory Recovery: After passing the pillar, the robot uses the Dual Color Sensors to quickly re-align itself with the center of the track, preventing a collision with the next wall.3. The Finale: Precision Parallel ParkingAfter the third lap is confirmed by the lap-counter, the robot enters its Parking Sub-Routine:Search Phase: The vehicle slows to 30% power, using the Laser Sensor to find a gap in the wall (the parking lot).Execution Phase: Once the gap is found, the robot performs a synchronized multi-step move:Reverse-Yaw: The DC Motor reverses while the Servo turns to a 45° angle.Counter-Steer: The Servo flips to the opposite angle to bring the front of the car into the space.Final Alignment: The robot straightens its wheels and stops, completing the mission
+The battery that we used for our robot: 
+
+<img width="259" height="194" alt="Battery" src="https://github.com/user-attachments/assets/6198caca-8863-428c-85c2-f596614bd539" />
+Vehicle Overview: The Matrix Engineering Philosophy: 
+
+Front View Analysis: Sensor Array and Ackerman Alignment
+The front view of the vehicle highlights the mission-critical systems required for the Obstacle and Open challenges.
+
+Key Technical Features:
+A. Dual Sensor Mount: We engineered a rigid, forward-facing bracket using two Matrix chassis plates to mount our primary Dual Color Sensors. This spacing is carefully calibrated to match the track markers.
+
+Color Sensor 1 (Left): Programmed to detect Blue/Orange floor milestones (Lap Tracker).
+
+Color Sensor 2 (Right): Programmed to classify Red/Green traffic pillars (Dodge Logic).
+
+B. Micro Servo Integration: Positioned directly behind the sensor array is the primary Steering Servo. This location provides immediate and balanced mechanical linkage to the front knuckles, reducing steering "play" for faster response times in obstacle dodge maneuvers.
+
+C. Ackermann Geometry: The front wheels utilize a car-like Ackermann steering mechanism (rather than differential drive). This engineering choice provides vastly superior directional stability at higher velocities and prevents wheel skid during sharp turns, which is critical for precision pathing in the dynamic corridor challenge.
+
+D. Track-Optimized Wheels: We utilized the Matrix kit's large-diameter, soft-rubber tires on the front axle. The tread pattern and soft compound provide the necessary traction for rapid steering adjustments.
+<img width="3024" height="4032" alt="Front View" src="https://github.com/user-attachments/assets/8d6500ec-42c1-42c7-93e4-a27c2452a2b0" />
+
 
 Our Engineering Approach
 We believe in an iterative design process. Our development focused on three main pillars:
