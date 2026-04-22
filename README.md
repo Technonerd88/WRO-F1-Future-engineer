@@ -1,5 +1,10 @@
 # WRO-F1-Future-engineer
-Welcome to the official repository for Team F1 representing Kuwait!. This project focuses on the development of an autonomous RC vehicle designed to navigate a complex track using computer vision and sensor fusion.
+
+
+
+<img width="2316" height="3088" alt="unnamed" src="https://github.com/user-attachments/assets/ebbca2d5-5954-4dd9-914f-37c204f79c7a" />
+
+Welcome to the official repository for Team F1 representing Kuwait!. About Us: On the right is me mahdi khalid! I am 20 years old and this is my 2nd year participating in WRO. On the left is my friend Abdulkareem! He is 15 years old and this is also his 2nd year participating in WRO competition Our Project: This project focuses on the development of an autonomous RC vehicle designed to navigate a complex track using computer vision and sensor fusion.
 Our goal is to build a robot that can:
 
 Autonomously navigate a track marked by lines and walls.
@@ -11,6 +16,13 @@ The Robot: Max Verstappen
 Brain: Matrix/Arduino
 
 Vision/Sensors: 2X colour sensor 1X laser sensor
+
+<img width="320" height="584" alt="Laser sensor" src="https://github.com/user-attachments/assets/f88c67a5-0e04-4c20-a7a6-9e7a0775d9d3" />
+
+<img width="287" height="574" alt="Colour sensor" src="https://github.com/user-attachments/assets/cdc63020-4011-422b-8ccc-a9e8b67aabc5" />
+
+
+
 
 Hardware Configuration
 Our robotic platform utilizes a three-point sensing array designed for high-speed navigation and obstacle management:
@@ -31,6 +43,12 @@ comparing the values between the left and right color sensors, the robot calcula
 Drive: DC Motors 
 
 Steering: Servo 
+
+<img width="363" height="600" alt="Servo steering" src="https://github.com/user-attachments/assets/a3352adb-ee73-48d4-903c-28b13340c422" />
+
+
+
+
 
 Repository Structure
 /src: The core C++ source code and control logic.
