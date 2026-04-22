@@ -152,10 +152,29 @@ Mission Execution & Algorithmic Strategy1. Open Challenge: Adaptive PathfindingO
 The battery that we used for our robot: 
 
 <img width="259" height="194" alt="Battery" src="https://github.com/user-attachments/assets/6198caca-8863-428c-85c2-f596614bd539" />
-Vehicle Overview: The Matrix Engineering Philosophy: 
 
-Front View Analysis: Sensor Array and Ackerman Alignment
+
+Vehicle Overview: The Matrix Engineering Philosophy: 
+For the 2026 WRO Competition, Team F1 adopted a modular, high-reliability approach by utilizing the standard Matrix Robotics System for all structural and mechanical components. Instead of relying on iterative custom 3D prints (which can have structural flaws or tolerance issues), we chose to leverage the robustness of the Matrix kit’s perforated metal chassis and standardized components. This decision allowed for rapid mechanical prototyping and robust integration with our Arduino-based control logic, ensuring the vehicle remained physically resilient during high-speed autonomous navigation.
+
+Front View Analysis: Sensor Array and Servo Alignment
 The front view of the vehicle highlights the mission-critical systems required for the Obstacle and Open challenges.
+
+<img width="3024" height="4032" alt="Front View" src="https://github.com/user-attachments/assets/217caa82-9cdf-411b-beb2-da5486a6c8aa" />
+The side profile illustrates the overall vehicle packaging and the robust mechanical structure.
+
+Key Technical Features:
+A. Central Command Hub: The Matrix Arduino Controller is mounted centrally on a rigid riser made of Matrix plates. This configuration provides several advantages:
+
+Balanced Center of Gravity: Prevents the vehicle from tipping during aggressive braking or acceleration.
+
+Wire Management: Its proximity to both front and rear axles keeps the sensor (front) and motor (rear) wire runs short and protected, reducing electrical noise.
+
+B. Rear Drive DC Motor: A high-torque Matrix DC Motor with an integrated encoder is clearly visible on the rear axle. Using a single drive motor on a fixed rear axle (vs. dual rear motors) ensures the vehicle always pulls in a perfectly straight line relative to its propulsion.
+
+C. Rigid Drivetrain Linkage: The rear DC motor is rigidly connected directly to the chassis frame and wheel hub. This elimainates energy loss through complex drivetrain systems, ensuring 100% of motor power is converted into propulsion.
+
+D. Caster Alignment (Front Suspension): By utilizing the Matrix perforated plates at precise angles, we achieved a mechanical "caster angle" on the front suspension knuckles. This geometry naturally pulls the robot back toward a straight line, reducing the computational load on the Arduino for steering corrections on the straightaways.
 
 Key Technical Features:
 A. Dual Sensor Mount: We engineered a rigid, forward-facing bracket using two Matrix chassis plates to mount our primary Dual Color Sensors. This spacing is carefully calibrated to match the track markers.
@@ -166,11 +185,37 @@ Color Sensor 2 (Right): Programmed to classify Red/Green traffic pillars (Dodge 
 
 B. Micro Servo Integration: Positioned directly behind the sensor array is the primary Steering Servo. This location provides immediate and balanced mechanical linkage to the front knuckles, reducing steering "play" for faster response times in obstacle dodge maneuvers.
 
-C. Ackermann Geometry: The front wheels utilize a car-like Ackermann steering mechanism (rather than differential drive). This engineering choice provides vastly superior directional stability at higher velocities and prevents wheel skid during sharp turns, which is critical for precision pathing in the dynamic corridor challenge.
+C. Track-Optimized Wheels: We utilized the Matrix kit's large-diameter, soft-rubber tires on the front axle. The tread pattern and soft compound provide the necessary traction for rapid steering adjustments.
 
-D. Track-Optimized Wheels: We utilized the Matrix kit's large-diameter, soft-rubber tires on the front axle. The tread pattern and soft compound provide the necessary traction for rapid steering adjustments.
-<img width="3024" height="4032" alt="Front View" src="https://github.com/user-attachments/assets/8d6500ec-42c1-42c7-93e4-a27c2452a2b0" />
+Side View Analysis: Centralized Processing and Suspension Geometry
+<img width="3024" height="4032" alt="Side views" src="https://github.com/user-attachments/assets/5ebbe0f4-016c-4e6c-b297-e9b5a891e75e" />
 
+The side profile illustrates the overall vehicle packaging and the robust mechanical structure.
+
+Key Technical Features:
+A. Central Command Hub: The Matrix Arduino Controller is mounted centrally on a rigid riser made of Matrix plates. This configuration provides several advantages:
+
+Balanced Center of Gravity: Prevents the vehicle from tipping during aggressive braking or acceleration.
+
+Wire Management: Its proximity to both front and rear axles keeps the sensor (front) and motor (rear) wire runs short and protected, reducing electrical noise.
+
+B. Rear Drive DC Motor: A high-torque Matrix DC Motor with an integrated encoder is clearly visible on the rear axle. Using a single drive motor on a fixed rear axle (vs. dual rear motors) ensures the vehicle always pulls in a perfectly straight line relative to its propulsion.
+
+C. Rigid Drivetrain Linkage: The rear DC motor is rigidly connected directly to the chassis frame and wheel hub. This elimainates energy loss through complex drivetrain systems, ensuring 100% of motor power is converted into propulsion.
+
+D. Caster Alignment (Front Suspension): By utilizing the Matrix perforated plates at precise angles, we achieved a mechanical "caster angle" on the front suspension knuckles. This geometry naturally pulls the robot back toward a straight line, reducing the computational load on the Arduino for steering corrections on the straightaways.
+
+Bottom View Analysis: Power Transfer and Ground Plane Logic
+<img width="3024" height="4032" alt="Bottom view" src="https://github.com/user-attachments/assets/a1488723-81ef-4f4b-a7a2-a9538a5e68d4" />
+
+Key Technical Features:
+A. "Spine" Chassis Riser: The chassis is constructed using two primary Matrix metal plates running vertically. We utilized a perpendicular riser assembly (near the hand in the photo). This increases the vertical rigidity of the frame, preventing the chassis from flexing or twisting, which would misalign the sensors during acceleration.
+
+B. Fixed Back Axle: The rear drivetrain is a direct-drive configuration. The DC motor is fixed to a rigid bracket, with a solid axle shaft transmitting power across the rear of the car. This ensures no "diff slip" occurs, allowing the vehicle to corner predictably in every scenario.
+
+C. High-Traction Rear Hubs: The rear wheels (visible with blue plastic hubs in this view) use a wider, softer tire than the front. This provides maximum grip to prevent slipping at the start-finish line (detected by the color sensors) and ensures consistent acceleration for predictable lap timing.
+
+D. Sensor Mounting Clearance: Both color sensors are visible, mounted directly on the leading edge. Crucially, they are offset slightly ahead of the front axle. This allows the sensors to provide data to the Arduino before the steering tires reach that point, giving the processor time to calculate the necessary Ackermann steering angle for smooth navigation.
 
 Our Engineering Approach
 We believe in an iterative design process. Our development focused on three main pillars:
