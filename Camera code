@@ -1,45 +1,128 @@
-import sensor, image, time  # Import image sensor and time modules
-from matrix_mini import send_data  # Import the send_data function from the matrix_mini module
+import sensor, time, math, pyb
+from pyb import UART, Pin, LED
 
-# Initialize the sensor
-sensor.reset()  # Reset the sensor
-sensor.set_pixformat(sensor.RGB565)  # Set the pixel format to RGB565
-sensor.set_framesize(sensor.QVGA)  # Set the image resolution to QVGA (320x240)
-sensor.skip_frames(time=2000)  # Wait for 2 seconds to stabilize the sensor
+# RED (strong red only)
+red_threshold = (30, 80, 50, 127, 20, 127)
 
-# Set image flipping
-# sensor.set_vflip(True)  # Vertically flip the image
-sensor.set_hmirror(True)  # Horizontally mirror the image
+# GREEN (ONLY green, no white)
+green_threshold = (35, 75, -90, -20, 20, 80)
 
-# Define color threshold range (HSV), suitable for detecting the target color
-threshold = (0, 0, 0, 0, 0, 0)  # Hue, Saturation, and Value range
+# Initialize camera
+sensor.reset()
+sensor.set_pixformat(sensor.RGB565)
+sensor.set_framesize(sensor.QVGA)
 
-clock = time.clock()  # Create a clock to calculate frames per second (FPS) of image processing
+sensor.set_auto_gain(False)
+sensor.set_auto_whitebal(False)
 
+sensor.skip_frames(time=2000)
+clock = time.clock()
+
+# UART + control
+uart = UART(3, 115200)
+pin0 = Pin('P4', Pin.IN, Pin.PULL_NONE)
+is_enabled = False
+green_led = LED(2)
+green_led.on()
+
+def enable_if_start_received():
+    global is_enabled
+    if uart.any() >= 5:
+        start_signal = uart.read(5)
+        if start_signal == b'start':
+            is_enabled = True
+            green_led.off()
+
+def send_data(send_buffer):
+    global is_enabled
+
+    if not is_enabled:
+        enable_if_start_received()
+        return
+
+    length = len(send_buffer)
+    if length > 20:
+        raise Exception("Too much data")
+
+    uart.writechar(0xaa)
+    uart.writechar(length)
+    check = 0xaa ^ length
+
+    for n in send_buffer:
+        n = round(n)
+        uart.writechar(n & 0xff)
+        uart.writechar((n >> 8) & 0xff)
+        check ^= (n & 0xff)
+        check ^= ((n >> 8) & 0xff)
+
+    uart.writechar(check)
+
+# ================= MAIN LOOP =================
 while True:
-    clock.tick()  # Start timing
-    img = sensor.snapshot()  # Capture an image
+    clock.tick()
+    img = sensor.snapshot()
 
-    print(clock.fps())  # Output the current FPS
+    # ROI: bottom half only
+    roi = (0, int(img.height()/2), img.width(), int(img.height()/2))
 
-    # Find blobs (color regions) in the image that match the threshold
-    blobs = img.find_blobs([threshold], pixels_threshold=200, area_threshold=200)
-    if blobs:  # If blobs are found
-        # Find the largest blob by area
-        max_blob = max(blobs, key=lambda b: b[2] * b[3])
+    thresholds = [red_threshold, green_threshold]
 
-        img.draw_rectangle(max_blob.rect())  # Draw a rectangle around the largest blob
+    blobs = img.find_blobs(
+        thresholds,
+        pixels_threshold=200,
+        area_threshold=200,
+        roi=roi,
+        merge=True
+    )
 
-        # Calculate the center coordinates of the blob
-        x_center = max_blob.cx()
-        y_center = max_blob.cy()
+    if blobs:
+        max_blob = max(blobs, key=lambda b: b.area())
 
-        # Calculate the blob's area and round it to an integer
-        blob_area = round(max_blob.area() / 2)
+        if max_blob.area() > 300:
 
-        # Send the center coordinates and area to an external system
-        send_data([x_center, y_center, blob_area])
+            # Shape filter
+            w = max_blob.w()
+            h = max_blob.h()
+            ratio = w / h if h != 0 else 0
 
-        # Mark the center point and coordinates text on the image
-        img.draw_cross(x_center, y_center)  # Draw a cross at the center
-        img.draw_string(0, 0, str(x_center) + ", " + str(y_center))  # Display the coordinates
+            if 1.2 <= ratio <= 3.0:
+
+                color_id = max_blob.code()
+
+                if color_id == 1:
+                    color = (255, 0, 0)
+                    label = "RED"
+                elif color_id == 2:
+                    color = (0, 255, 0)
+                    label = "GREEN"
+
+
+
+    if chosen_blob and chosen_blob.area() > 300:
+        x = chosen_blob.cx()
+        area = chosen_blob.area()
+    
+        # Distance
+        if area > 5000:
+            distance = 1
+        elif area > 2500:
+            distance = 2
+        else:
+            distance = 3
+    
+        # Color
+        if color_id == 1:
+            color = (255, 0, 0)
+            label = "RED"
+        else:
+            color = (0, 255, 0)
+            label = "GREEN"
+    
+        # Draw
+        img.draw_rectangle(chosen_blob.rect(), color=color)
+        img.draw_cross(x, chosen_blob.cy(), color=color)
+        img.draw_string(x, chosen_blob.y()-10, label, color=color)
+    
+        print(label, "Area:", area)
+    
+        send_data([x, distance, color_id])
